@@ -1,0 +1,50 @@
+
+--An overview of the data we will be working with
+SELECT *
+FROM Chemicals_in_cosmetics
+
+
+--Find out which chemicals were used the most in cosmetics and personal care products
+SELECT ChemicalName, COUNT(ChemicalName) AS CountOfChemical
+FROM Chemicals_in_cosmetics
+WHERE PrimaryCategory = 'Personal Care Products' OR PrimaryCategory = 'Makeup Products (non-permanent)'
+GROUP BY ChemicalName
+ORDER BY CountOfChemical DESC;
+-- Titanium Dioxide was mostly used in cosmetics and personal care
+
+
+--Find out which companies used the most reported chemicals in their cosmetics and personal care products.
+SELECT DISTINCT CompanyName
+FROM Chemicals_in_cosmetics
+WHERE MostRecentDateReported IN (
+SELECT MostRecentDateReported
+FROM Chemicals_in_cosmetics
+WHERE PrimaryCategory = 'Personal Care Products' OR PrimaryCategory = 'Makeup Products (non-permanent)'
+);
+
+
+--Which brands had chemicals that were removed and discontinued? Identify the chemicals.
+SELECT DISTINCT BrandName, ChemicalName
+FROM Chemicals_in_cosmetics
+WHERE DiscontinuedDate IS NOT NULL
+AND ChemicalDateRemoved IS NOT NULL
+ORDER BY ChemicalName;
+
+
+--Identify the brands that had chemicals which were mostly reported in 2018
+SELECT DISTINCT BrandName, COUNT(ChemicalName) AS ChemicalsReportedIn2018
+FROM Chemicals_in_cosmetics
+WHERE InitialDateReported LIKE '%2018'
+AND MostRecentDateReported LIKE '%2018'
+GROUP BY BrandName
+ORDER BY ChemicalsReportedIn2018 DESC;
+
+
+
+--Which brands had chemicals discontinued and removed?
+SELECT DISTINCT BrandName
+FROM Chemicals_in_cosmetics
+WHERE DiscontinuedDate IS NOT NULL
+AND ChemicalDateRemoved IS NOT NULL
+ORDER BY BrandName;
+--A total of 102 brands where discontinued and removed
