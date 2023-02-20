@@ -1,0 +1,65 @@
+--Overview of the main data we will be workin with
+SELECT *
+FROM dailyActivity_merged
+
+SELECT *
+FROM dailySteps_merged
+
+
+--Selecting unique IDs to find unique participants with their daily activity 
+SELECT DISTINCT Id
+FROM dailyActivity_merged;
+--33 unique IDs were reported in the DailyActivity table
+
+--Selecting unique IDs in SleepLog table
+SELECT DISTINCT Id 
+FROM sleepDay_merged
+-- 24 unique IDs reported in SleepLog table
+
+--Selecting unique IDs in the calorie table
+SELECT DISTINCT Id 
+FROM dailyCalories_merged
+-- 33 unique IDs reported in WeightLog table
+
+--Selecting unique IDs in WeightLog table
+SELECT DISTINCT Id 
+FROM weightLogInfo_merged
+--8 unique IDs reported in WeightLog table
+
+--1) Finding relationsip between calories and sedentary minutes
+SELECT DISTINCT Id, TotalSteps, SedentaryMinutes, Calories
+FROM dailyActivity_merged
+ORDER BY SedentaryMinutes DESC
+--Those who spent more time sedentary didn't burn more than 1,347 calories daily because they weren't active
+
+--2) Finding Total steps and calories burnt
+SELECT ActivityDate, TotalSteps, dailyCalories_merged.Calories
+FROM dailyActivity_merged
+INNER JOIN dailyCalories_merged
+ON dailyActivity_merged.Calories = dailyCalories_merged.Calories
+WHERE dailyActivity_merged.Calories >= 1600 
+ORDER BY Calories DESC
+--According to the Dietary Guidelines, the average adult woman expends roughly 1,600 to 2,400 calories per day, while the average adult man expends 2,000 to 3,000
+--Ids who had the most number of steps burnt more calories
+--The IDs who had the highest number of steps burnt a minimum of 4,900 calries
+
+
+-- 3) Relationship between Total Steps, Weight(kg) and BMI
+SELECT DISTINCT weightLogInfo_merged.Id, TotalSteps, WeightKg, BMI
+FROM weightLogInfo_merged
+JOIN dailyActivity_merged
+ON weightLogInfo_merged.Id = dailyActivity_merged.Id
+ORDER BY TotalSteps DESC;
+-- According to World Health Organisation (WHO) BMI is the most useful population level measure of overweight and obesity, and is used as the same for both sexes and in all ages of adults
+-- BMI is calculated by weight (kg) divided by height (m) squared (kg/m2) 
+--A BMI of 18.5 - 24.9 is considered normal/healthy 
+
+
+-- 4) Relationship between total minutes asleep and sleep time in bed
+SELECT TotalTimeInBed, TotalMinutesAsleep, BMI
+FROM sleepDay_merged
+JOIN weightLogInfo_merged
+ON sleepDay_merged.id = weightLogInfo_merged.Id
+ORDER BY TotalTimeInBed DESC;
+--From this analyis those who spent more time in bed and asleep didn't burn enough calories because they were not active
+--A person is considered healthy from their BMI, because it takes into account (Height, gender, weight and age) which was not provided in the dataset
