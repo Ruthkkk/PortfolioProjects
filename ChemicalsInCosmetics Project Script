@@ -1,0 +1,68 @@
+--An overview of the data we will be working with
+SELECT *
+FROM ChemicalsInCosmetics
+
+
+--Find out which chemicals were used the most in cosmetics and personal care products
+SELECT ChemicalName, COUNT(ChemicalName) AS CountOfChemical
+FROM ChemicalsInCosmetics
+WHERE PrimaryCategory = 'Personal Care Products' OR PrimaryCategory = 'Makeup Products (non-permanent)'
+GROUP BY ChemicalName
+ORDER BY CountOfChemical DESC;
+-- Titanium Dioxide was mostly used in cosmetics and personal care
+
+
+--Find out which companies used the most reported chemicals in their cosmetics and personal care products.
+SELECT DISTINCT CompanyName, COUNT(InitialDateReported) AS CountOfInitialDateReported, COUNT(MostRecentDateReported) AS CountOfMostRecentDateReported
+FROM ChemicalsInCosmetics
+WHERE PrimaryCategory = 'Personal Care Products' OR PrimaryCategory = 'Makeup Products (non-permanent)'
+GROUP BY CompanyName
+ORDER BY CountOfInitialDateReported DESC, CountOfMostRecentDateReported DESC;
+-- S+ Company used the most reported chemicals in their cosmetics and personal care products
+
+
+--Which brands had chemicals that were removed and discontinued? Identify the chemicals.
+SELECT DISTINCT BrandName, ChemicalName, COUNT(ChemicalDateRemoved) AS ChemicalsRemoved, COUNT(DiscontinuedDate) AS ChemicalsDiscontinued
+FROM ChemicalsInCosmetics
+WHERE DiscontinuedDate IS NOT NULL
+AND ChemicalDateRemoved IS NOT NULL
+GROUP BY ChemicalName, BrandName
+ORDER BY ChemicalName;
+--Below are the chemicals removed and discontinued: 1,4-Dioxane, Acetaldehyde, Arsenic, Benzene, Benzophenone, Benzophenone, Benzyl chloride, Butylated hydroxyanisole, Caffeic acid, Carbon black, Cocamide DEA, Cocamide diethanolamine, Cocamide MEA, Coffee, Dichloroacetic acid, Dichloromethane (Methylene chloride), Diethanolamides, Diethanolamine, Estragole, Ethyl acrylate, Ethylene glycol, Ethylene oxide, Formaldehyde (gas), Genistein (purified), Lauramide DEA, Lead, Methyl chloride, Methyleugenol, N-Nitrosodimethylamine, Propylene oxide, Retinol/retinyl esters, Safrole, Silica crystalline, Styrene, Titanium dioxide, Trade Secret, Triethanolamine
+
+
+--Identify the brands that had chemicals which were mostly reported in 2018
+SELECT DISTINCT BrandName, COUNT(ChemicalName) AS ChemicalsReportedIn2018
+FROM ChemicalsInCosmetics
+WHERE InitialDateReported LIKE '%2018'
+AND MostRecentDateReported LIKE '%2018'
+GROUP BY BrandName
+ORDER BY ChemicalsReportedIn2018 DESC;
+--A total of 174 brands were reported in 2018 but the brand ‘Makeup Forever’ was the most reported. 
+
+
+--Which brands had chemicals discontinued and removed?
+SELECT DISTINCT BrandName
+FROM ChemicalsInCosmetics
+WHERE DiscontinuedDate IS NOT NULL
+AND ChemicalDateRemoved IS NOT NULL
+ORDER BY BrandName;
+--A total of 102 brands where discontinued and removed
+
+
+-- Identify the period between the creation of the removed chemicals and when they were actually removed
+SELECT ChemicalName, ChemicalCreatedAt, ChemicalDateRemoved, ABS(DATEDIFF(day, ChemicalCreatedAt, ChemicalDateRemoved)) AS PeriodDays
+FROM ChemicalsInCosmetics
+WHERE ChemicalCreatedAt IS NOT NULL
+AND ChemicalDateRemoved IS NOT NULL
+GROUP BY ChemicalName, ChemicalCreatedAt, ChemicalDateRemoved
+ORDER BY PeriodDays DESC
+
+
+-- How long were removed chemicals in baby products used? (Tip: Use creation date to tell)
+SELECT PrimaryCategory, ChemicalName, ChemicalCreatedAt, ChemicalDateRemoved, DATEDIFF(day, ChemicalCreatedAt, ChemicalDateRemoved) AS BabyProductsPeriod
+FROM ChemicalsInCosmetics
+WHERE PrimaryCategory = 'Baby Products'
+AND ChemicalCreatedAt IS NOT NULL
+AND ChemicalDateRemoved IS NOT NULL
+ORDER BY BabyProductsPeriod DESC;
