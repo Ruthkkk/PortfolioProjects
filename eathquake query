@@ -1,0 +1,179 @@
+--Finding all earthquakes
+SELECT *
+FROM earthquake_data
+
+
+--Finding top 10 earthquakes
+SELECT TOP 10 *
+FROM earthquake_data
+
+
+--Number of earthquake between 2001 and 2023 (the entire dataset)
+SELECT COUNT(*)
+FROM earthquake_data
+--they were 782 earthquakes between 2001 and 2003
+
+
+-- Minimum vs Maximum Magnitude
+SELECT MIN(magnitude) AS minumum_mag, MAX(magnitude) AS max_magnitude, country
+FROM earthquake_data
+WHERE country IS NOT NULL
+GROUP BY country
+ORDER BY country;
+
+
+--Earthquakes and their magnitude
+SELECT title, COUNT(title) AS earthquake, magnitude
+FROM earthquake_data
+GROUP BY title,  magnitude
+ORDER BY earthquake DESC
+
+
+--Finding unique earthquakes
+SELECT DISTINCT title, magnitude, depth, longitude, latitude
+FROM earthquake_data
+
+
+--Unique countries where the earthquake happened
+SELECT DISTINCT country
+FROM earthquake_data
+WHERE country IS NOT NULL
+--There are 49 unique countries
+
+
+--Sorting to find anomalies
+SELECT country, magnitude, alert, depth, longitude, latitude
+FROM earthquake_data
+WHERE country IS NOT NULL AND alert IS NOT NULL
+ORDER BY magnitude DESC;
+--there are 2 countries who had magnitude values greater than 8, one of them is Indonesia while the other is unknown 
+
+
+--Country with the most earthquake / anomalies
+SELECT DISTINCT country, COUNT(magnitude) AS count_of_magnitude
+FROM earthquake_data
+WHERE country IS NOT NULL
+GROUP BY country
+ORDER BY count_of_magnitude DESC;
+--Indonesia
+
+
+--Sorting to find anomalies where country is not NULL
+SELECT country, magnitude, depth, longitude, latitude
+FROM earthquake_data
+WHERE country IS NOT NULL
+ORDER BY magnitude DESC;
+--there are 3 countries who had values greater than 7 in magnitude are Peru, Fiji, Chile
+
+
+--Earthquake that happened in the last one year (2022-2023)
+SELECT country, magnitude, depth, longitude,latitude, month
+FROM earthquake_data
+WHERE year BETWEEN '2022' AND '2023' AND country IS NOT NULL
+ORDER BY month;
+--18 eathquakes has happened in the last one year
+
+
+--Earthquake that happened in the last 10 years (2013 to 2023)
+SELECT country, magnitude, depth, longitude,latitude, year
+FROM earthquake_data
+WHERE year BETWEEN '2013' AND '2023' AND country is NOT NULL
+ORDER BY country DESC;
+--228 earthquakes has happened in the last 10 years
+
+--Number of countries with earthquake in the last 10 years
+SELECT COUNT(DISTINCT country)
+FROM earthquake_data
+WHERE year BETWEEN '2013' AND '2023' 
+--41 countries had earthquakes in the last 10 years
+
+
+--Number of countries with earthquake in the last 1 year
+SELECT COUNT(DISTINCT country)
+FROM earthquake_data
+WHERE year BETWEEN '2022' AND '2023' 
+--12 countries had earthquakes in the last 1 year
+
+
+--Calculating data for histogram
+SELECT magnitude, depth, COUNT(*) AS Earthquakes
+FROM earthquake_data
+GROUP BY magnitude, depth
+ORDER BY magnitude, depth;
+
+
+--Earthquakes where magnitude greater than 7.0 magnitude
+SELECT date, country, Location, magnitude, COUNT(*) AS Count
+FROM earthquake_data
+WHERE magnitude >= 7.0 AND  country IS NOT NULL
+GROUP BY date, country, location, magnitude
+ORDER BY magnitude DESC;
+--Most of the earthquakes with the highest magnitude were recorded somewhere in Indonesia
+
+
+--Erthquakes where depth is greater than 600
+SELECT date, Country, location, depth, magnitude, count(*) AS count
+FROM earthquake_data
+WHERE depth > 600 AND country IS NOT NULL AND location IS NOT NULL
+GROUP BY date, country, location, depth, magnitude
+ORDER BY date DESC;
+--Most of the earthquakes with very deep depths were recorded somewhere in Fiji
+
+
+-- Depths recorded in Fiji
+SELECT depth, magType
+FROM earthquake_data
+WHERE depth > 600 AND country LIKE '%Fiji%';
+
+
+--Frequencies
+--The earthquake frequency in each year
+SELECT year, COUNT(*) AS earthquakes
+FROM earthquake_data
+GROUP BY year
+ORDER BY earthquakes DESC;
+--2013 & 2015 experienced the most earthquake
+
+
+--The earthquake frequency in year and country
+SELECT country, year, COUNT(*) AS earthquakes
+FROM earthquake_data
+WHERE country IS NOT NULL
+GROUP BY country, year
+ORDER BY earthquakes DESC;
+--Looks like indonesia has had the most earthquakes
+
+
+--Checking for earthquakes in Indonesia
+SELECT country, year, COUNT(*) AS earthquakes
+FROM earthquake_data
+WHERE country IS NOT NULL AND country = 'indonesia'
+GROUP BY country, year
+ORDER BY earthquakes DESC;
+--21 earthquakes has happened in Indonesia within 2001 and 2003
+
+
+--show all the records within Indonesia
+SELECT location, latitude, longitude, depth, magnitude, COUNT(*) AS count
+FROM earthquake_data
+WHERE location LIKE '%Indonesia%' 
+GROUP BY location, latitude, longitude, depth, magnitude
+
+
+--The earthquake frequency in year 2022
+SELECT year, COUNT(*) AS earthquakes
+FROM earthquake_data
+WHERE year LIKE '2022%'
+GROUP BY year 
+ORDER BY year DESC
+--they were 40 earthquakes in 2022
+
+
+--The earthquake frequency in months (2001 - 2023)
+SELECT month, COUNT(*) AS earthquakes
+FROM earthquake_data
+GROUP BY month
+ORDER BY earthquakes DESC;
+--Most earthquakes happened between April & September
+
+
